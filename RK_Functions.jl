@@ -1,4 +1,9 @@
-function take_timestep_array(rhs::Function, u, iter, dt)
+function take_timestep_array(rhs::Function, L, u, dt)
+    #u should be an array containing the current values of the desired quantities
+    #rhs should be a function to operate on the explicit part of the differential equation
+    #L should be a matrix representation of the implicit operator used
+    #dt is the step size to take
+    
     
     #Take a time step using RK stages for ARk[4](3)6L[2]SA 
     #see citation [FIX_ME] in the decription in the main notebook
@@ -8,61 +13,61 @@ function take_timestep_array(rhs::Function, u, iter, dt)
     M = 1/(1-0.25*dt*L)
     
     
-    #k is the ...
-    k = zeros(6, length(u[1,:]));
-    #l is the ...
-    l= zeros(6, length(u[1,:]));
+    #k is the derivative estimate of the explicit piece
+    k = zeros(Float64,length(u),6);
+    #l is the derivative estimate of the implicit piece
+    l= zeros(Float64, length(u),6);
     
     #Stage 1
-    k[1,:] = rhs(u[iter,:])
-    l[1,:] = L*u[iter,:]
+    k[:,1] = rhs(u)
+    l[:,1] = L*u
     
     #Stage 2
-    u_tmp = M*(u(iter,:)+dt*(ae[2,1]*k[1,:] + ai[2,1]*l[1,:]))
-    k[2] = rhs(u_tmp)
-    l[2,:] = L*u_tmp
+    u_tmp = M*(u+dt*(ae[2,1]*k[:,1] + ai[2,1]*l[:,1]))
+    k[:,2] = rhs(u_tmp)
+    l[:,2] = L*u_tmp
     
     #Stage 3
-    u_tmp = M*(u_tmp+dt*(ae[3,1]*k[1] + ae[3,2]*k[2,:] 
-                       + ai[3,1]*l[1] + ai[3,2]*l[2,:]))
-    k[3,:] = rhs(u_tmp) 
-    l[3,:] = L*u_tmp
+    u_tmp = M*(u_tmp+dt*(ae[3,1]*k[:,1] + ae[3,2]*k[:,2] 
+                       + ai[3,1]*l[:,2] + ai[3,2]*l[:,2]))
+    k[:,3] = rhs(u_tmp) 
+    l[:,3] = L*u_tmp
     
     #Stage 4
-    u_tmp = M*(u_tmp+dt*(ae[4,1]*k[1] + ae[4,2]*k[2,:] + ae[4,3]*k[3,:] 
-                       + ai[4,1]*l[1] + ai[4,2]*l[2,:] + ai[4,3]*l[3,:]))
-    k[4,:] = rhs(u_tmp) 
-    l[4,:] = L*u_tmp
+    u_tmp = M*(u_tmp+dt*(ae[4,1]*k[:,1] + ae[4,2]*k[:,2] + ae[4,3]*k[:,3] 
+                       + ai[4,1]*l[:,1] + ai[4,2]*l[:,2] + ai[4,3]*l[:,3]))
+    k[:,4] = rhs(u_tmp) 
+    l[:,4] = L*u_tmp
     
     #Stage 5
-    u_tmp = M*(u_tmp+dt*(ae[5,1]*k[1] + ae[5,2]*k[2,:]  + ae[5,3]*k[3,:] + ae[5,4]*k[4,:]
-                       + ai[5,1]*l[1] + ai[5,2]*l[2,:]  + ai[5,3]*l[3,:] + ai[5,4]*l[4,:]))
+    u_tmp = M*(u_tmp+dt*(ae[5,1]*k[:,1] + ae[5,2]*k[:,2]  + ae[5,3]*k[:,3] + ae[5,4]*k[:,4]
+                       + ai[5,1]*l[:,1] + ai[5,2]*l[:,2]  + ai[5,3]*l[:,3] + ai[5,4]*l[:,4]))
     
-    k[5,:] = rhs(u_tmp) 
-    l[5,:] = L*u_tmp
+    k[:,5] = rhs(u_tmp) 
+    l[:,5] = L*u_tmp
     
     #Stage 6
-    u_tmp = M*(u_tmp+dt*(ae[6,1]*k[1] + ae[6,2]*k[2,:]  + ae[6,3]*k[3,:] + ae[6,4]*k[4,:] + ae[6,5]*k[5,:]
-                       + ai[6,1]*l[1] + ai[6,2]*l[2,:]  + ai[6,3]*l[3,:] + ai[6,4]*l[4,:] + ai[6,5]*l[5,:]))
-    
-    k[6,:] = rhs(u_tmp) 
-    l[6,:] = L*u_tmp
+    u_tmp = M*(u_tmp+dt*(ae[6,1]*k[:,1] + ae[6,2]*k[:,2]  + ae[6,3]*k[:,3] + ae[6,4]*k[:,4] + ae[6,5]*k[:,5]
+                       + ai[6,1]*l[:,1] + ai[6,2]*l[:,2]  + ai[6,3]*l[:,3] + ai[6,4]*l[:,4] + ai[6,5]*l[:,5]))
+    k[:,6] = rhs(u_tmp) 
+    l[:,6] = L*u_tmp
     
     #Error Check
     #IAN_LOOK (see question from Matt in Matt's Notes)
     err_sum = 0 
     for i=1:6
-        err_sum = err_sum + be[i]*k[i,1]+l[i,1]
-    end
-     
-    #On a successful round
-    u_next = u[iter,:]
-        
-    for i=1:6
-        u_next = u_next + dt*(b[i]*k[i,:]+l[i,:])
+        err_sum = err_sum + be[i]*k[1,1]+l[1,i]
     end
     
-    return hcat(u_next, u)
+    
+     
+    #On a successful round
+    u_next = u
+    for i=1:6
+        u_next = u_next + dt*(b[i]*k[:,i]+l[:,i])
+    end
+ 
+    return u_next
     
 end
 
