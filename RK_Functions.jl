@@ -28,26 +28,26 @@ function take_timestep_array(rhs::Function, L, u, dt)
     l[:,2] = L*u_tmp
     
     #Stage 3
-    u_tmp = M*(u_tmp+dt*(ae[3,1]*k[:,1] + ae[3,2]*k[:,2] 
+    u_tmp = M*(u+dt*(ae[3,1]*k[:,1] + ae[3,2]*k[:,2] 
                        + ai[3,1]*l[:,2] + ai[3,2]*l[:,2]))
     k[:,3] = rhs(u_tmp) 
     l[:,3] = L*u_tmp
     
     #Stage 4
-    u_tmp = M*(u_tmp+dt*(ae[4,1]*k[:,1] + ae[4,2]*k[:,2] + ae[4,3]*k[:,3] 
+    u_tmp = M*(u+dt*(ae[4,1]*k[:,1] + ae[4,2]*k[:,2] + ae[4,3]*k[:,3] 
                        + ai[4,1]*l[:,1] + ai[4,2]*l[:,2] + ai[4,3]*l[:,3]))
     k[:,4] = rhs(u_tmp) 
     l[:,4] = L*u_tmp
     
     #Stage 5
-    u_tmp = M*(u_tmp+dt*(ae[5,1]*k[:,1] + ae[5,2]*k[:,2]  + ae[5,3]*k[:,3] + ae[5,4]*k[:,4]
+    u_tmp = M*(u+dt*(ae[5,1]*k[:,1] + ae[5,2]*k[:,2]  + ae[5,3]*k[:,3] + ae[5,4]*k[:,4]
                        + ai[5,1]*l[:,1] + ai[5,2]*l[:,2]  + ai[5,3]*l[:,3] + ai[5,4]*l[:,4]))
     
     k[:,5] = rhs(u_tmp) 
     l[:,5] = L*u_tmp
     
     #Stage 6
-    u_tmp = M*(u_tmp+dt*(ae[6,1]*k[:,1] + ae[6,2]*k[:,2]  + ae[6,3]*k[:,3] + ae[6,4]*k[:,4] + ae[6,5]*k[:,5]
+    u_tmp = M*(u+dt*(ae[6,1]*k[:,1] + ae[6,2]*k[:,2]  + ae[6,3]*k[:,3] + ae[6,4]*k[:,4] + ae[6,5]*k[:,5]
                        + ai[6,1]*l[:,1] + ai[6,2]*l[:,2]  + ai[6,3]*l[:,3] + ai[6,4]*l[:,4] + ai[6,5]*l[:,5]))
     k[:,6] = rhs(u_tmp) 
     l[:,6] = L*u_tmp

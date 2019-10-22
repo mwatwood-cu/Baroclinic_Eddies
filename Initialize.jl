@@ -1,15 +1,35 @@
 module Init
 
-    struct Phys_Params
-        k_deform
-        domain_wid
-        k_beta
-        r_eckman
-        drag_coeff
-        nu_buoy
-        model_type
-        N_points
+    mutable struct Phys_Params
+        k_deform::Float64
+        domain_wid::Float64
+        k_beta::Float64
+        r_eckman::Float64
+        drag_coeff::Float64
+        nu_buoy::Float64
+        model_type::Integer
+        N_points::Integer
     end
+
+    mutable struct Psi_Parameters
+        InvBT 
+        InvBC 
+        InvMat
+    end
+
+    mutable struct Laplacian_Parameters
+        dX
+        dY
+        DX
+        DY
+        Laplacian
+    end
+
+    psi_param = Psi_Parameters(0, 0, 0)
+    lap_param = Laplacian_Parameters(0, 0, 0, 0, 0)
+
+    export psi_param, lap_param
+    
     using FFTW
 
     #   Set simulation parameters
@@ -44,7 +64,7 @@ module Init
     nu = 1E-11;
 
     
-    params = Phys_Params(kd, LX, kb, r, c_d, nu, model, N);
+    parameters = Phys_Params(kd, LX, kb, r, c_d, nu, model, N);
 
     # Set up hyperviscous PV dissipation
     # wavenumbers
@@ -71,7 +91,7 @@ module Init
     # qp is the "physical" potential vorticity, i.e. values on the grid
     qp = randn(N, N); 
     # q is the Fourier coefficients of potential vorticity
-    q = fft(qp);
+    q = FFTW.rfft(qp);
     # If model = 2 then qp is surface buoyancy on the grid
 
     # Initialize Tracer Diagnostics
