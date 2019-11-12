@@ -4,7 +4,7 @@ module Init
         k_deform::Float64
         domain_wid::Float64
         k_beta::Float64
-        r_eckman::Float64
+        r_ekman::Float64
         drag_coeff::Float64
         nu_buoy::Float64
         model_type::Integer
@@ -12,8 +12,8 @@ module Init
     end
 
     mutable struct Psi_Parameters
-        InvBT 
-        InvBC 
+        InvBaroTropic 
+        InvBaroClinic 
         InvMat
     end
 
@@ -26,7 +26,7 @@ module Init
     end
 
     psi_param = Psi_Parameters(0, 0, 0)
-    lap_param = Laplacian_Parameters(0, 0, 0, 0, 0)
+    laplace_param = Laplacian_Parameters(0, 0, 0, 0, 0)
 
     export psi_param, lap_param
     
@@ -35,7 +35,7 @@ module Init
     #   Set simulation parameters
     model = 1;
     # Number of grid points in each direction
-    N=256
+    N=16
     # Compute diagnostics every countDiag steps
     countDiag = 5;
     # Is the time step adaptive
@@ -57,24 +57,25 @@ module Init
     # Nondimensional beta wavenumber; assumed to be 0 for 2-surface
     kb = 0;
     # Nondimensional Ekman friction coefficient
-    r = 0.1;
+    r_ekman = 0.5;
     # Nondimensional quadratic drag coefficient
     c_d = 0.1;
     # Coefficient of hyperviscous PV/buoyancy diffusion
     nu = 1E-11;
 
     
-    parameters = Phys_Params(kd, LX, kb, r, c_d, nu, model, N);
+    parameters = Phys_Params(kd, LX, kb, r_ekman, c_d, nu, model, N);
 
     # Set up hyperviscous PV dissipation
     # wavenumbers
     k = (2*pi/LX)*vcat(0:N/2, -N/2+1:-1);
 
-    L = zeros(N, N);
-    for j=1:N
-        for i=1:N
+    L = zeros(Int(div(N,2)+1), N, 2);
+    for i=1:Int(N/2+1)
+        for j=1:N
             kr = sqrt(k[i]^2+k[j]^2);
-            L[i,j] = -nu*kr^2;
+            L[i,j,1] = -nu*kr^2;
+            L[i,j,2] = -nu*kr^2;
         end
     end
 
@@ -89,9 +90,9 @@ module Init
     # Initialize
     t = 0;
     # qp is the "physical" potential vorticity, i.e. values on the grid
-    qp = randn(N, N); 
+    qp = randn(N, N, 2); 
     # q is the Fourier coefficients of potential vorticity
-    q = FFTW.rfft(qp);
+    q = FFTW.rfft(qp, 1:2);
     # If model = 2 then qp is surface buoyancy on the grid
 
     # Initialize Tracer Diagnostics
