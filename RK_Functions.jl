@@ -53,21 +53,33 @@ function take_timestep_array(rhs::Function, L, u, dt)
     l[:,:,:,6] = L .* u_tmp
     
     #Error Check
-    #IAN_LOOK (see question from Matt in Matt's Notes)
-    err_sum = 0 
+    fourier_error_sum = zeros(ComplexF64,size(u)[1], size(u)[2], size(u)[3]) 
     for i=1:6
-        err_sum = err_sum + be[i]*k[1,1,1,1]+l[1,1,1,i]
+        fourier_error_sum = fourier_error_sum + be[i]*k[:,:,:,i]+l[:,:,:,i]
+    end
+    real_error_sum = FFTW.irfft(fourier_error_sum, Init.parameters.N_points);
+    error_max = dt*maximum(real_error_sum)
+    
+    println(Init.isAdaptive)
+    if(Init.isAdaptive && error_max > Init.tol )
+        return take_timestep_array(rhs, L, u, 0.75*dt)
     end
     
-    
-     
     #On a successful round
     u_next = u
     for i=1:6
         u_next = u_next + dt*(b[i]*k[:,:,:,i]+l[:,:,:,i])
     end
  
-    return u_next
+    if(Init.isAdaptive)
+        r0 = Init.time_parameters.r0;
+        next_dt = dt*((.75*Init.tol/error_max)^(.3/4))*((Init.r0/error_max)^(.4/4))
+        Init.time_parameters.r0 = error_max
+    else
+        next_dt = dt
+    end
+    
+    return u_next, next_dt
     
 end
 

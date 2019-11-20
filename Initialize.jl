@@ -25,6 +25,10 @@ module Init
         Laplacian
     end
 
+    mutable struct Time_Step_Parameters
+        r0
+    end
+
     psi_param = Psi_Parameters(0, 0, 0)
     laplace_param = Laplacian_Parameters(0, 0, 0, 0, 0)
 
@@ -35,11 +39,11 @@ module Init
     #   Set simulation parameters
     model = 1;
     # Number of grid points in each direction
-    N=16
+    N=64
     # Compute diagnostics every countDiag steps
     countDiag = 5;
     # Is the time step adaptive
-    isAdaptive = false;
+    isAdaptive = true;
     # Starting time step; will change if adaptive
     dt = .01;
     # Number of Time steps
@@ -84,8 +88,8 @@ module Init
     # Adaptive stepping
     tol= 1E-2;
     r0 = .8*tol;
-
-    export tol, r0
+    time_parameters = Time_Step_Parameters(r0)
+    export tol, time_parameters
 
     # Initialize
     t = 0;
