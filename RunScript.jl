@@ -12,10 +12,10 @@ function RunScript()
     setup_QG_RHS();
 
 
-    io = open("starting.txt","w")
+    io = open("\projects\mawa7160\Tests\starting.txt","w")
     writedlm(io,Init.qp[:,:,1])
     close(io)
-    io = open("results.txt","w")
+    io = open("\projects\mawa7160\Tests\results.txt","w")
     print(io,"Iter\t Timestep\n")
     u_next = Init.q
     dt_next = 0.01
@@ -29,7 +29,7 @@ function RunScript()
     end
     close(io)
     qp = FFTW.irfft(u_next, Init.parameters.N_points)
-    io = open("final_state.txt", "w")
+    io = open("\projects\mawa7160\Tests\final_state.txt", "w")
     writedlm(io, qp[:,:,1])
     close(io)
 end
