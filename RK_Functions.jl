@@ -80,10 +80,9 @@ function take_timestep_array(rhs::Function, L, u, dt)
     end
     
     #Test case 1 same forcing for both top and bottom
-    stocastic = Create_Stoch_Pert(Int(Init.parameters.N_points/2+1), Init.parameters.N_points);
-   
-    u_next[:,:,:,1] = u_next[:,:,:,1] + sqrt(next_dt)*stocastic;
-    u_next[:,:,:,2] = u_next[:,:,:,2] + sqrt(next_dt)*stocastic;
+    #stocastic = Create_Stoch_Pert(Int(Init.parameters.N_points/2+1), Init.parameters.N_points);
+    #u_next[:,:,1] = u_next[:,:,1] + sqrt(next_dt).*stocastic;
+    #u_next[:,:,2] = u_next[:,:,2] + sqrt(next_dt).*stocastic;
     
     
     return u_next, next_dt

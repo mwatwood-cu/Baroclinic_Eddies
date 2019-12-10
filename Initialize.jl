@@ -57,8 +57,8 @@ module Init
     # Nondimensional deformation wavenumber. 2-surface assumes kd=1.
     kd = 1; 
     # Nondimensional domain width
-    LX = 2*pi
-    Ly = 2*pi
+    LX = 2
+    Ly = 2
     # Nondimensional beta wavenumber; assumed to be 0 for 2-surface
     kb = 0;
     # Nondimensional Ekman friction coefficient
