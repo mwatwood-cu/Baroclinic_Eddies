@@ -39,7 +39,7 @@ module Init
     #   Set simulation parameters
     model = 1;
     # Number of grid points in each direction
-    N=64
+    N=128
     # Compute diagnostics every countDiag steps
     countDiag = 5;
     # Is the time step adaptive
@@ -57,7 +57,8 @@ module Init
     # Nondimensional deformation wavenumber. 2-surface assumes kd=1.
     kd = 1; 
     # Nondimensional domain width
-    LX = 2*pi;
+    LX = 2*pi
+    Ly = 2*pi
     # Nondimensional beta wavenumber; assumed to be 0 for 2-surface
     kb = 0;
     # Nondimensional Ekman friction coefficient
@@ -83,7 +84,7 @@ module Init
         end
     end
 
-    export k, L, params
+    export k, L, parameters
 
     # Adaptive stepping
     tol= 1E-2;
@@ -104,4 +105,45 @@ module Init
 
     export t, qp, q, T
 
+    #Stocastic bounds
+    kMin = 19*pi
+    kMax = 21*pi
+
+    #Creating Stochastic Forcing Spectrum
+    kx = zeros(Int(N/2+1), N)
+    ky = zeros(Int(N/2+1), N)
+    k2 = zeros(Int(N/2+1), N)
+
+    #Initialize wavenumbers
+    for i=1:Int(N/2+1)
+        kx[i,:] = ones(N).*(2*pi/LX) * (i-1)
+    end
+
+    for j=1:Int(N/2+1)
+        ky[:,j] = ones(Int(N/2+1)).*(2*pi/Ly) * (j-1)
+    end
+    for j=Int(N/2+2):N
+        ky[:,j] = ones(Int(N/2+1)).*(2*pi/Ly) * (j-N-1)
+    end
+
+    k2 = kx.^2+ky.^2
+    stoch_spec = zeros(Int(N/2+1), N)
+    for j=1:N
+       for i=1:Int(N/2+1)
+           if ( (kMin^2<=k2[i,j]) && (k2[i,j]<=kMax^2) ) 
+               stoch_spec[i,j] = 1/sqrt.(k2[i,j])
+           end
+       end
+   end
+   stoch_spec[1,1] = 0
+
+   dy = Ly/N
+
+   y = zeros(N,N) 
+   
+   for j=1:N
+        y[:,j] = ones(N).*(-(Ly+dy)/2 + dy*j) 
+   end
+
+   export stoch_spec, k2, y, Ly
 end

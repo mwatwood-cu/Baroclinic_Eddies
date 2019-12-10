@@ -60,7 +60,7 @@ function take_timestep_array(rhs::Function, L, u, dt)
     real_error_sum = FFTW.irfft(fourier_error_sum, Init.parameters.N_points);
     error_max = dt*maximum(real_error_sum)
     
-    println(Init.isAdaptive)
+    #println(Init.isAdaptive)
     if(Init.isAdaptive && error_max > Init.tol )
         return take_timestep_array(rhs, L, u, 0.75*dt)
     end
@@ -78,6 +78,13 @@ function take_timestep_array(rhs::Function, L, u, dt)
     else
         next_dt = dt
     end
+    
+    #Test case 1 same forcing for both top and bottom
+    stocastic = Create_Stoch_Pert(Int(Init.parameters.N_points/2+1), Init.parameters.N_points);
+   
+    u_next[:,:,:,1] = u_next[:,:,:,1] + sqrt(next_dt)*stocastic;
+    u_next[:,:,:,2] = u_next[:,:,:,2] + sqrt(next_dt)*stocastic;
+    
     
     return u_next, next_dt
     
