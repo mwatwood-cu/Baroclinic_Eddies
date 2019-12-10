@@ -6,6 +6,6 @@
 #SBATCH --partition=shas-testing
 #SBATCH --output=mesoscale-out.out
 
-source /curc/sw/anaconda3/2019.03/bin/activate
-conda activate julia
+module load gcc/8.2.0
+module load python/3.6.5 cmake/3.14.1 
 julia RunScript.jl
