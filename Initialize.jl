@@ -39,7 +39,7 @@ module Init
     #   Set simulation parameters
     model = 1;
     # Number of grid points in each direction
-    N=128
+    N=1280
     # Compute diagnostics every countDiag steps
     countDiag = 5;
     # Is the time step adaptive
@@ -66,7 +66,7 @@ module Init
     # Nondimensional quadratic drag coefficient
     c_d = 0.1;
     # Coefficient of hyperviscous PV/buoyancy diffusion
-    nu = 1E-11;
+    nu = 3.125e-5;
 
     
     parameters = Phys_Params(kd, LX, kb, r_ekman, c_d, nu, model, N);
@@ -106,8 +106,11 @@ module Init
     export t, qp, q, T
 
     #Stocastic bounds
-    kMin = 19*pi
-    kMax = 21*pi
+    kMin = 15*pi
+    kMax = 17*pi
+
+    #Spatial scaling
+    MR_scale = 0.3
 
     #Creating Stochastic Forcing Spectrum
     kx = zeros(Int(N/2+1), N)

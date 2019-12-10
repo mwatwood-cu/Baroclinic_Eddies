@@ -37,6 +37,6 @@ function spatial_localize()
             end
         end
     end
-    MR = 0.25.*MR
+    MR = Init.MR_scale*MR
     return MR
 end
