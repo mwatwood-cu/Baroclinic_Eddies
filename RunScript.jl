@@ -8,30 +8,38 @@ include("Explicit_RHS.jl")
 include("Stocastic.jl")
 
 function RunScript()
+    println("Strating Script")
     Setup_Psi()
     setup_QG_RHS();
 
-
-    io = open("\projects\mawa7160\Tests\starting.txt","w")
+    println("Starting Ouput")
+    io = open("/scratch/summit/mawa7160/Tests/starting2.txt","w")
     writedlm(io,Init.qp[:,:,1])
     close(io)
-    io = open("\projects\mawa7160\Tests\results.txt","w")
-    print(io,"Iter\t Timestep\n")
+    println("Starting time steps")
     u_next = Init.q
-    dt_next = 0.01
-    for i in 1:50
+    dt_next = 0.000001
+    for i in 1:4000
         u_next, dt_next = take_timestep_array(QG_RHS, Init.L, u_next, dt_next)
-        if(i%5 ==0)
-            print(io, string(i, "\t", dt_next, "\n"))
-            #qp = FFTW.irfft(u_next, Init.parameters.N_points)
+        if(i%50 ==0)
+            println(string(i, "\t", dt_next, "\n"))
+        end
+        if(i%250 == 0)
+            qp = FFTW.irfft(u_next, Init.parameters.N_points)
+            io = open(string("/projects/mawa7160/Tests/state2_",string(i),".txt"), "w")
+            writedlm(io, qp[:,:,1])
+            close(io)
             #imshow(qp[:,:,1])
         end
     end
-    close(io)
     qp = FFTW.irfft(u_next, Init.parameters.N_points)
-    io = open("\projects\mawa7160\Tests\final_state.txt", "w")
+    io = open("/scratch/summit/mawa7160/Tests/final_state2.txt", "w")
     writedlm(io, qp[:,:,1])
     close(io)
 end
 
+function test()
+    println("Testing")
+end
 RunScript()
+#test()

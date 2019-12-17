@@ -2,10 +2,10 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --time=00:01:00
-#SBATCH --partition=shas-testing
-#SBATCH --output=mesoscale-out.out
+#SBATCH --time=06:00:00
+#SBATCH --partition=shas
+#SBATCH --output=mesoscale-%j.out
 
-module load gcc/8.2.0
-module load python/3.6.5 cmake/3.14.1 
-julia RunScript.jl
+echo "Starting"
+../software/julia-1.3.0/bin/julia RunScript.jl
+echo "Ending"
