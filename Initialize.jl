@@ -29,10 +29,20 @@ module Init
         r0
     end
 
+    mutable struct Time_Averaged_Values
+        dZ
+        dKE
+        dq
+        dTr
+        duT
+    end
+
+    time_avgs = Time_Averaged_Values(0,0,0,0,0)
+
     psi_param = Psi_Parameters(0, 0, 0)
     laplace_param = Laplacian_Parameters(0, 0, 0, 0, 0)
 
-    export psi_param, lap_param
+    export psi_param, lap_param, time_avgs
     
     using FFTW
 
