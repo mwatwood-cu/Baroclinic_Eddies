@@ -55,7 +55,7 @@ function take_timestep_array(rhs::Function, L, u, dt)
     #Error Check
     fourier_error_sum = zeros(ComplexF64,size(u)[1], size(u)[2], size(u)[3]) 
     for i=1:6
-        fourier_error_sum = fourier_error_sum + be[i]*k[:,:,:,i]+l[:,:,:,i]
+        fourier_error_sum = fourier_error_sum + be[i]*(k[:,:,:,i]+l[:,:,:,i])
     end
     real_error_sum = FFTW.irfft(fourier_error_sum, Init.parameters.N_points);
     error_max = dt*maximum(real_error_sum)
